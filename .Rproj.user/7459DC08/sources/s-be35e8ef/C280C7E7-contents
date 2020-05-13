@@ -1,0 +1,11 @@
+---
+title: R Studio/Python Blog Post
+author: Tasha Delacour
+date: '2020-05-13'
+slug: r-studio-python-blog-post
+categories: []
+tags: []
+description: ''
+---
+![](/post/2020-05-13-r-studio-python-blog-post_files/python joke.jpg)
+blogdown::serve_site()

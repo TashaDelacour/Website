@@ -1,0 +1,308 @@
+---
+title: "Project1"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+
+
+<div id="tasha-delacour-td23448" class="section level2">
+<h2>Tasha Delacour td23448</h2>
+<p><em>I have chosen the datasets “hate_crimes” and “police_killings” due to believing there may be a possible correlatiom between the two. I have a sociology minor and I wokr with incarcerated youth (many of whom have been victims of police brutality). The datasets have 12 variables and 34 variables, respectively. However, I will mainly be focusing on these following variables: avg_hatecrimes_per_100k_fbi, age, gender, state, share_non_white, h_income, and college. I combined both datasets by their common variable “state”. I expect that there will be correlations between amount of college completed and household income. I also expect there will also be a correlation between share_non_white and avg_hatecrimes_per_100k_fbi.</em></p>
+<pre class="r"><code>#Installed packages and viewed the datasets
+install.packages(&quot;fivethirtyeight&quot;)</code></pre>
+<pre><code>## Installing package into &#39;/stor/home/td23448/R/x86_64-pc-linux-gnu-library/3.4&#39;
+## (as &#39;lib&#39; is unspecified)</code></pre>
+<pre class="r"><code>library(fivethirtyeight)
+data(package=.packages(all.available = TRUE))</code></pre>
+<pre><code>## Warning in data(package = .packages(all.available = TRUE)): datasets have been
+## moved from package &#39;base&#39; to package &#39;datasets&#39;</code></pre>
+<pre><code>## Warning in data(package = .packages(all.available = TRUE)): datasets have been
+## moved from package &#39;stats&#39; to package &#39;datasets&#39;</code></pre>
+<pre class="r"><code>data(police_killings)
+data(hate_crimes)</code></pre>
+<pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
+<pre><code>## Installing package into &#39;/stor/home/td23448/R/x86_64-pc-linux-gnu-library/3.4&#39;
+## (as &#39;lib&#39; is unspecified)</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.1     ✔ purrr   0.3.3
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.5
+## ✔ tidyr   1.0.2     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ───────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>install.packages(&quot;dplyr&quot;)</code></pre>
+<pre><code>## Installing package into &#39;/stor/home/td23448/R/x86_64-pc-linux-gnu-library/3.4&#39;
+## (as &#39;lib&#39; is unspecified)</code></pre>
+<pre><code>## Warning in install.packages(&quot;dplyr&quot;): installation of package &#39;dplyr&#39; had non-
+## zero exit status</code></pre>
+<pre class="r"><code>library(dplyr)
+#renamed &quot;state_abbrev&quot; in hate_crimes dataset to &quot;state&quot; to match up to variable in police_killings
+hate_crimes&lt;-hate_crimes%&gt;%select(-state)
+hate_crimes&lt;-hate_crimes%&gt;%rename(&quot;state&quot;=&quot;state_abbrev&quot;)
+merged.data2&lt;-left_join(hate_crimes, police_killings, by=&quot;state&quot;)
+project&lt;-merged.data2%&gt;%group_by(state)
+project%&gt;%pivot_longer(cols=c(&quot;cause&quot;,&quot;armed&quot;), names_to=&quot;cause_of_death&quot;, values_to=&quot;values&quot;)</code></pre>
+<pre><code>## # A tibble: 942 x 45
+## # Groups:   state [51]
+##    state median_house_inc share_unemp_seas share_pop_metro share_pop_hs
+##    &lt;chr&gt;            &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+##  1 AL               42278             0.06            0.64        0.821
+##  2 AL               42278             0.06            0.64        0.821
+##  3 AL               42278             0.06            0.64        0.821
+##  4 AL               42278             0.06            0.64        0.821
+##  5 AL               42278             0.06            0.64        0.821
+##  6 AL               42278             0.06            0.64        0.821
+##  7 AL               42278             0.06            0.64        0.821
+##  8 AL               42278             0.06            0.64        0.821
+##  9 AL               42278             0.06            0.64        0.821
+## 10 AL               42278             0.06            0.64        0.821
+## # … with 932 more rows, and 40 more variables: share_non_citizen &lt;dbl&gt;,
+## #   share_white_poverty &lt;dbl&gt;, gini_index &lt;dbl&gt;, share_non_white &lt;dbl&gt;,
+## #   share_vote_trump &lt;dbl&gt;, hate_crimes_per_100k_splc &lt;dbl&gt;,
+## #   avg_hatecrimes_per_100k_fbi &lt;dbl&gt;, name &lt;chr&gt;, age &lt;int&gt;, gender &lt;chr&gt;,
+## #   raceethnicity &lt;chr&gt;, month &lt;chr&gt;, day &lt;int&gt;, year &lt;int&gt;,
+## #   streetaddress &lt;chr&gt;, city &lt;chr&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;,
+## #   state_fp &lt;int&gt;, county_fp &lt;int&gt;, tract_ce &lt;int&gt;, geo_id &lt;dbl&gt;,
+## #   county_id &lt;int&gt;, namelsad &lt;chr&gt;, lawenforcementagency &lt;chr&gt;, pop &lt;int&gt;,
+## #   share_white &lt;dbl&gt;, share_black &lt;dbl&gt;, share_hispanic &lt;dbl&gt;, p_income &lt;int&gt;,
+## #   h_income &lt;int&gt;, county_income &lt;int&gt;, comp_income &lt;dbl&gt;,
+## #   county_bucket &lt;int&gt;, nat_bucket &lt;int&gt;, pov &lt;dbl&gt;, urate &lt;dbl&gt;,
+## #   college &lt;dbl&gt;, cause_of_death &lt;chr&gt;, values &lt;chr&gt;</code></pre>
+<pre class="r"><code>project%&gt;%pivot_wider(names_from=&quot;armed&quot;,values_from=&quot;cause&quot;)</code></pre>
+<pre><code>## # A tibble: 471 x 51
+## # Groups:   state [51]
+##    state median_house_inc share_unemp_seas share_pop_metro share_pop_hs
+##    &lt;chr&gt;            &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+##  1 AL               42278            0.06             0.64        0.821
+##  2 AL               42278            0.06             0.64        0.821
+##  3 AL               42278            0.06             0.64        0.821
+##  4 AL               42278            0.06             0.64        0.821
+##  5 AL               42278            0.06             0.64        0.821
+##  6 AL               42278            0.06             0.64        0.821
+##  7 AL               42278            0.06             0.64        0.821
+##  8 AL               42278            0.06             0.64        0.821
+##  9 AK               67629            0.064            0.63        0.914
+## 10 AK               67629            0.064            0.63        0.914
+## # … with 461 more rows, and 46 more variables: share_non_citizen &lt;dbl&gt;,
+## #   share_white_poverty &lt;dbl&gt;, gini_index &lt;dbl&gt;, share_non_white &lt;dbl&gt;,
+## #   share_vote_trump &lt;dbl&gt;, hate_crimes_per_100k_splc &lt;dbl&gt;,
+## #   avg_hatecrimes_per_100k_fbi &lt;dbl&gt;, name &lt;chr&gt;, age &lt;int&gt;, gender &lt;chr&gt;,
+## #   raceethnicity &lt;chr&gt;, month &lt;chr&gt;, day &lt;int&gt;, year &lt;int&gt;,
+## #   streetaddress &lt;chr&gt;, city &lt;chr&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;,
+## #   state_fp &lt;int&gt;, county_fp &lt;int&gt;, tract_ce &lt;int&gt;, geo_id &lt;dbl&gt;,
+## #   county_id &lt;int&gt;, namelsad &lt;chr&gt;, lawenforcementagency &lt;chr&gt;, pop &lt;int&gt;,
+## #   share_white &lt;dbl&gt;, share_black &lt;dbl&gt;, share_hispanic &lt;dbl&gt;, p_income &lt;int&gt;,
+## #   h_income &lt;int&gt;, county_income &lt;int&gt;, comp_income &lt;dbl&gt;,
+## #   county_bucket &lt;int&gt;, nat_bucket &lt;int&gt;, pov &lt;dbl&gt;, urate &lt;dbl&gt;,
+## #   college &lt;dbl&gt;, No &lt;chr&gt;, Knife &lt;chr&gt;, Firearm &lt;chr&gt;, Other &lt;chr&gt;,
+## #   `Non-lethal firearm` &lt;chr&gt;, Vehicle &lt;chr&gt;, Disputed &lt;chr&gt;, `NA` &lt;chr&gt;</code></pre>
+<p><em>All joins were performed on the datasets to determine which was better. It was determined that a left_join was the best option as the max number of observations is increased to 471 and the variables have been combined to a make a total of 45 variables. No variables were dropped–I will manually drop them using dyplr functions. “state” was dropped from hate_crimes and “state_abbrev” was renamed to “state” in order to create a common ID for both datasets with the same formatted observation.</em></p>
+<pre class="r"><code>glimpse(project)</code></pre>
+<pre><code>## Observations: 471
+## Variables: 45
+## Groups: state [51]
+## $ state                       &lt;chr&gt; &quot;AL&quot;, &quot;AL&quot;, &quot;AL&quot;, &quot;AL&quot;, &quot;AL&quot;, &quot;AL&quot;, &quot;AL&quot;,…
+## $ median_house_inc            &lt;int&gt; 42278, 42278, 42278, 42278, 42278, 42278,…
+## $ share_unemp_seas            &lt;dbl&gt; 0.060, 0.060, 0.060, 0.060, 0.060, 0.060,…
+## $ share_pop_metro             &lt;dbl&gt; 0.64, 0.64, 0.64, 0.64, 0.64, 0.64, 0.64,…
+## $ share_pop_hs                &lt;dbl&gt; 0.821, 0.821, 0.821, 0.821, 0.821, 0.821,…
+## $ share_non_citizen           &lt;dbl&gt; 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02,…
+## $ share_white_poverty         &lt;dbl&gt; 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12,…
+## $ gini_index                  &lt;dbl&gt; 0.472, 0.472, 0.472, 0.472, 0.472, 0.472,…
+## $ share_non_white             &lt;dbl&gt; 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35,…
+## $ share_vote_trump            &lt;dbl&gt; 0.63, 0.63, 0.63, 0.63, 0.63, 0.63, 0.63,…
+## $ hate_crimes_per_100k_splc   &lt;dbl&gt; 0.1258389, 0.1258389, 0.1258389, 0.125838…
+## $ avg_hatecrimes_per_100k_fbi &lt;dbl&gt; 1.806410, 1.806410, 1.806410, 1.806410, 1…
+## $ name                        &lt;chr&gt; &quot;A&#39;donte Washington&quot;, &quot;Anthony Briggs&quot;, &quot;…
+## $ age                         &lt;int&gt; 16, 36, 77, 46, 54, 39, 38, 53, 33, 33, 2…
+## $ gender                      &lt;chr&gt; &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;…
+## $ raceethnicity               &lt;chr&gt; &quot;Black&quot;, &quot;Black&quot;, &quot;Black&quot;, &quot;White&quot;, &quot;Whit…
+## $ month                       &lt;chr&gt; &quot;February&quot;, &quot;May&quot;, &quot;March&quot;, &quot;February&quot;, &quot;…
+## $ day                         &lt;int&gt; 23, 25, 27, 11, 11, 19, 20, 10, 10, 28, 7…
+## $ year                        &lt;int&gt; 2015, 2015, 2015, 2015, 2015, 2015, 2015,…
+## $ streetaddress               &lt;chr&gt; &quot;Clearview Ln&quot;, &quot;1100 E Gateway Dr SE&quot;, &quot;…
+## $ city                        &lt;chr&gt; &quot;Millbrook&quot;, &quot;Huntsville&quot;, &quot;Birmingham&quot;, …
+## $ latitude                    &lt;dbl&gt; 32.52958, 34.61684, 33.56375, 32.86452, 3…
+## $ longitude                   &lt;dbl&gt; -86.36283, -86.56411, -86.72381, -85.7209…
+## $ state_fp                    &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 4, 4, 4, 4,…
+## $ county_fp                   &lt;int&gt; 51, 89, 73, 123, 3, 79, 73, 73, 20, 20, 1…
+## $ tract_ce                    &lt;int&gt; 30902, 2921, 2000, 962400, 10300, 979500,…
+## $ geo_id                      &lt;dbl&gt; 1051030902, 1089002921, 1073002000, 11239…
+## $ county_id                   &lt;int&gt; 1051, 1089, 1073, 1123, 1003, 1079, 1073,…
+## $ namelsad                    &lt;chr&gt; &quot;Census Tract 309.02&quot;, &quot;Census Tract 29.2…
+## $ lawenforcementagency        &lt;chr&gt; &quot;Millbrook Police Department&quot;, &quot;Huntsvill…
+## $ cause                       &lt;chr&gt; &quot;Gunshot&quot;, &quot;Gunshot&quot;, &quot;Gunshot&quot;, &quot;Gunshot…
+## $ armed                       &lt;chr&gt; &quot;No&quot;, &quot;Knife&quot;, &quot;No&quot;, &quot;Firearm&quot;, &quot;Firearm&quot;…
+## $ pop                         &lt;int&gt; 3779, 6018, 3708, 4720, 6971, 5791, 3681,…
+## $ share_white                 &lt;dbl&gt; 60.5, 89.9, 22.2, 66.2, 82.8, 86.3, 44.4,…
+## $ share_black                 &lt;dbl&gt; 30.5, 4.3, 77.8, 30.9, 15.0, 2.1, 22.4, 1…
+## $ share_hispanic              &lt;dbl&gt; 5.6, 1.4, 1.5, 0.1, 0.4, 0.0, 28.9, 7.7, …
+## $ p_income                    &lt;int&gt; 28375, 34698, 13968, 18363, 23683, 19149,…
+## $ h_income                    &lt;int&gt; 51367, 57935, 23977, 36694, 48173, 38078,…
+## $ county_income               &lt;int&gt; 54766, 58434, 45429, 39130, 50221, 38551,…
+## $ comp_income                 &lt;dbl&gt; 0.9379359, 0.9914605, 0.5277906, 0.937746…
+## $ county_bucket               &lt;int&gt; 3, 3, 1, 3, 3, 3, 2, 5, 1, 1, 1, 2, NA, 4…
+## $ nat_bucket                  &lt;int&gt; 3, 4, 1, 2, 3, 2, 2, 5, 3, 2, 1, 2, 4, 4,…
+## $ pov                         &lt;dbl&gt; 14.1, 8.9, 37.5, 20.1, 8.3, 17.0, 23.2, 3…
+## $ urate                       &lt;dbl&gt; 0.09768638, 0.06365810, 0.14504881, 0.078…
+## $ college                     &lt;dbl&gt; 0.16850951, 0.42225677, 0.08855025, 0.159…</code></pre>
+<pre class="r"><code>project&lt;-project%&gt;%arrange(desc(age))
+project%&gt;%filter(raceethnicity==&quot;Black&quot;)</code></pre>
+<pre><code>## # A tibble: 135 x 45
+## # Groups:   state [30]
+##    state median_house_inc share_unemp_seas share_pop_metro share_pop_hs
+##    &lt;chr&gt;            &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+##  1 AL               42278            0.06             0.64        0.821
+##  2 NC               46784            0.058            0.76        0.843
+##  3 OH               49644            0.045            0.75        0.876
+##  4 LA               42406            0.06             0.81        0.822
+##  5 GA               49555            0.058            0.82        0.839
+##  6 CA               60487            0.059            0.97        0.806
+##  7 MD               76165            0.051            0.97        0.89 
+##  8 VA               66155            0.043            0.89        0.866
+##  9 NY               54310            0.051            0.94        0.847
+## 10 NY               54310            0.051            0.94        0.847
+## # … with 125 more rows, and 40 more variables: share_non_citizen &lt;dbl&gt;,
+## #   share_white_poverty &lt;dbl&gt;, gini_index &lt;dbl&gt;, share_non_white &lt;dbl&gt;,
+## #   share_vote_trump &lt;dbl&gt;, hate_crimes_per_100k_splc &lt;dbl&gt;,
+## #   avg_hatecrimes_per_100k_fbi &lt;dbl&gt;, name &lt;chr&gt;, age &lt;int&gt;, gender &lt;chr&gt;,
+## #   raceethnicity &lt;chr&gt;, month &lt;chr&gt;, day &lt;int&gt;, year &lt;int&gt;,
+## #   streetaddress &lt;chr&gt;, city &lt;chr&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;,
+## #   state_fp &lt;int&gt;, county_fp &lt;int&gt;, tract_ce &lt;int&gt;, geo_id &lt;dbl&gt;,
+## #   county_id &lt;int&gt;, namelsad &lt;chr&gt;, lawenforcementagency &lt;chr&gt;, cause &lt;chr&gt;,
+## #   armed &lt;chr&gt;, pop &lt;int&gt;, share_white &lt;dbl&gt;, share_black &lt;dbl&gt;,
+## #   share_hispanic &lt;dbl&gt;, p_income &lt;int&gt;, h_income &lt;int&gt;, county_income &lt;int&gt;,
+## #   comp_income &lt;dbl&gt;, county_bucket &lt;int&gt;, nat_bucket &lt;int&gt;, pov &lt;dbl&gt;,
+## #   urate &lt;dbl&gt;, college &lt;dbl&gt;</code></pre>
+<pre class="r"><code>project</code></pre>
+<pre><code>## # A tibble: 471 x 45
+## # Groups:   state [51]
+##    state median_house_inc share_unemp_seas share_pop_metro share_pop_hs
+##    &lt;chr&gt;            &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+##  1 NY               54310            0.051            0.94        0.847
+##  2 OK               47199            0.044            0.59        0.856
+##  3 AL               42278            0.06             0.64        0.821
+##  4 CA               60487            0.059            0.97        0.806
+##  5 NJ               65243            0.056            1           0.874
+##  6 NC               46784            0.058            0.76        0.843
+##  7 CO               60940            0.04             0.8         0.893
+##  8 GA               49555            0.058            0.82        0.839
+##  9 AR               44922            0.052            0.69        0.824
+## 10 KY               42786            0.05             0.56        0.817
+## # … with 461 more rows, and 40 more variables: share_non_citizen &lt;dbl&gt;,
+## #   share_white_poverty &lt;dbl&gt;, gini_index &lt;dbl&gt;, share_non_white &lt;dbl&gt;,
+## #   share_vote_trump &lt;dbl&gt;, hate_crimes_per_100k_splc &lt;dbl&gt;,
+## #   avg_hatecrimes_per_100k_fbi &lt;dbl&gt;, name &lt;chr&gt;, age &lt;int&gt;, gender &lt;chr&gt;,
+## #   raceethnicity &lt;chr&gt;, month &lt;chr&gt;, day &lt;int&gt;, year &lt;int&gt;,
+## #   streetaddress &lt;chr&gt;, city &lt;chr&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;,
+## #   state_fp &lt;int&gt;, county_fp &lt;int&gt;, tract_ce &lt;int&gt;, geo_id &lt;dbl&gt;,
+## #   county_id &lt;int&gt;, namelsad &lt;chr&gt;, lawenforcementagency &lt;chr&gt;, cause &lt;chr&gt;,
+## #   armed &lt;chr&gt;, pop &lt;int&gt;, share_white &lt;dbl&gt;, share_black &lt;dbl&gt;,
+## #   share_hispanic &lt;dbl&gt;, p_income &lt;int&gt;, h_income &lt;int&gt;, county_income &lt;int&gt;,
+## #   comp_income &lt;dbl&gt;, county_bucket &lt;int&gt;, nat_bucket &lt;int&gt;, pov &lt;dbl&gt;,
+## #   urate &lt;dbl&gt;, college &lt;dbl&gt;</code></pre>
+<pre class="r"><code>project&lt;-project%&gt;% mutate(non_white=share_black+share_hispanic)
+project&lt;-project%&gt;%select(-share_black, -share_hispanic)
+project&lt;-project%&gt;%rename(&quot;white&quot;=&quot;share_white&quot;)
+project%&gt;%summarise(mean(age))</code></pre>
+<pre><code>## # A tibble: 51 x 2
+##    state `mean(age)`
+##    &lt;chr&gt;       &lt;dbl&gt;
+##  1 AK           33  
+##  2 AL           44.9
+##  3 AR           43.2
+##  4 AZ           35.2
+##  5 CA           35.3
+##  6 CO           35.8
+##  7 CT           41  
+##  8 DC           35  
+##  9 DE           43.5
+## 10 FL           34.7
+## # … with 41 more rows</code></pre>
+<pre class="r"><code>#removing columns that I found to be irrelavant to the comparisons I&#39;m focusing on
+project&lt;-project%&gt;%select(-latitude, -longitude, -tract_ce, -state_fp, -county_fp, -geo_id, -county_id,
+                          -county_income, -county_bucket, -comp_income, -nat_bucket, -pov, -urate)
+project&lt;-project%&gt;%select(-namelsad, -gini_index)
+project&lt;-project%&gt;%select(-median_house_inc, -share_unemp_seas, -share_pop_metro,
+                          -share_pop_hs, -share_non_citizen, -share_white_poverty, -share_vote_trump)</code></pre>
+<pre class="r"><code>IQR(project$age, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 17</code></pre>
+<pre class="r"><code>mean(project$age, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 37.36717</code></pre>
+<pre class="r"><code>sd(project$age, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 12.99713</code></pre>
+<pre class="r"><code>n_distinct(project$age, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 60</code></pre>
+<pre class="r"><code>quantile(project$age, na.rm = TRUE)</code></pre>
+<pre><code>##   0%  25%  50%  75% 100% 
+##   16   28   35   45   87</code></pre>
+<pre class="r"><code>#Installed Hmisc package to describe statistical variables of my combined datasets--&gt;it wasn&#39;t letting me knit with this function below (error of multibyte string, element 1?). This bit of code below had all of my statistical analysis
+#install.packages(&quot;Hmisc&quot;)
+#library(Hmisc)
+#Hmisc::describe(project)</code></pre>
+<p><em>Above is a table containing summary statistics on numeric variables as well as comparisons on gender and race/ethnicity. Value, proportion, and frequency is also calculated, showing that the majority of police killings happened in March and nearly all the victims were male (with an exception of 22 female victims). June had significantly fewer victims. The average age of victims is 37.7 years old, with the lowest and highest ages being 16 and 87, respectively. 236 of the victims were White, and 135 were Black–this did come as a surprise to me as typically White populations don’t experience hate crimes at such high frequency (I therefore conclude that there may be other factors involved, such as religion).</em></p>
+<pre class="r"><code>#Comparing relationship between two variables using ggplot
+ggplot(data = project, aes(x = h_income, y = college, color = gender)) + 
+  geom_point(size = 4, alpha = .5) + ggtitle(&quot;College Education Received vs. Household Income&quot;)</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (geom_point).</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" /> <em>This graph depicts the relationship between household income and amount of college completed. A positive correlation can be seen between the two variables–the more college completed, the higher the household income (there are a few outliers). This graph also displays gender via color, and it can be seen that the majority of the dataset is composed of male victims. There a couple NA values, but they are marked with a separate color. The majority of the data is clustered towards the bottom left–from this it can be gleaned that while the victims of these hate crimes and/or police killings are from different states, they fit a similar demographic.</em></p>
+<pre class="r"><code>ggplot(data=project, aes(x = state, y = avg_hatecrimes_per_100k_fbi, fill=share_non_white))+
+  geom_bar(stat=&quot;summary&quot;)+ ggtitle(&quot;State Hate Crime Against Non-white Occurred vs. Average Hate Crimes&quot;)</code></pre>
+<pre><code>## Warning: Removed 4 rows containing non-finite values (stat_summary).</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" /> <em>This graph demonstrates the relationship between the state were the killings occurred and the avg_hatecrimes_per_100k_fbi, and color codes by share_non_white. The grpah shows that DC actually has the highest average hatecrimes against non-white populations. DC also has a value of 0.6 in terms of share_non_white.The only part of the US that has no reported hate crimes is Hawaii. Most of the states fall in an average hate crime range of 2-5 (y-axis). States with low diversity (low share_non_white) tended to be located in the Mid-West.</em></p>
+<pre class="r"><code>#Retrieved packages from library to create correlation heatmap
+library(ggplot2)
+library(reshape2)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     smiths</code></pre>
+<pre class="r"><code>cormap&lt;-project[, c(2,4,6,20,21)]
+qplot(x=Var1, y=Var2, data=melt(cor(cormap)), fill=value, geom=&quot;tile&quot;)+ ggtitle(&quot;Correlation Heatmap&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-7-1.png" width="672" /> <em>This correlation heatmap shows no correlation between any of the variables. This could be because there truly is no correlation, or a coding error.</em></p>
+<pre class="r"><code>#Performed PAM clustering on selected data variables
+library(cluster)
+clust_dat&lt;-project%&gt;%dplyr::select(age,avg_hatecrimes_per_100k_fbi,share_non_white)</code></pre>
+<pre><code>## Adding missing grouping variables: `state`</code></pre>
+<pre class="r"><code>pam1&lt;-clust_dat%&gt;%pam(k=3)</code></pre>
+<pre><code>## Warning in data.matrix(x): NAs introduced by coercion</code></pre>
+<pre class="r"><code>pam1</code></pre>
+<pre><code>## Medoids:
+##       ID state age avg_hatecrimes_per_100k_fbi share_non_white
+## [1,] 467    NA  NA                   3.3017371            0.17
+## [2,] 470    NA  NA                   0.7527683            0.56
+## [3,] 471    NA  NA                   1.9030814            0.06
+## Clustering vector:
+##   [1] 1 2 3 3 1 2 1 2 2 1 1 2 1 3 2 1 1 1 2 2 2 2 2 1 1 2 3 3 2 3 3 1 2 3 2 1 2
+##  [38] 1 3 3 3 2 1 1 1 3 3 2 2 1 3 2 3 3 2 3 1 3 2 3 1 1 3 1 3 3 3 1 2 1 1 1 3 3
+##  [75] 1 2 2 2 2 1 3 2 1 1 2 2 1 1 1 3 3 2 2 1 1 3 3 1 2 2 3 2 1 2 2 1 3 3 1 2 2
+## [112] 3 3 1 2 2 3 2 2 2 2 1 3 1 2 2 1 3 3 2 3 2 2 3 2 1 3 3 3 2 2 1 1 2 2 2 3 3
+## [149] 3 1 2 2 1 1 3 1 2 3 2 2 1 3 2 1 2 1 1 2 2 1 2 2 3 3 3 1 1 1 2 2 2 3 1 1 1
+## [186] 1 1 1 2 3 3 2 3 1 1 3 1 1 3 3 3 1 2 2 2 2 2 2 3 1 1 2 3 2 3 3 3 3 2 2 3 2
+## [223] 1 1 1 1 2 3 1 1 2 3 3 3 3 3 3 1 2 3 1 1 2 2 2 2 1 3 3 2 2 3 2 2 3 1 1 3 3
+## [260] 2 1 2 2 3 3 3 3 1 3 3 2 2 2 1 2 2 2 1 3 3 3 1 2 1 1 2 2 3 2 1 1 2 3 3 3 2
+## [297] 3 2 2 1 1 3 2 1 2 2 2 2 2 1 1 2 2 3 2 1 1 3 3 3 3 2 2 3 1 3 3 1 1 2 2 2 3
+## [334] 1 1 1 3 3 3 3 2 2 2 1 3 1 3 1 3 3 3 2 2 2 3 2 2 3 3 1 2 1 3 3 3 1 2 2 3 2
+## [371] 1 1 2 2 2 2 2 1 3 3 2 2 2 2 2 1 2 2 2 1 3 3 3 2 1 1 1 1 2 2 3 2 2 2 3 3 3
+## [408] 3 3 2 2 3 3 3 3 2 1 3 3 2 2 2 2 1 2 2 1 3 3 3 3 1 2 2 3 1 2 1 2 2 1 1 3 2
+## [445] 3 2 2 2 2 1 2 1 2 3 1 1 2 1 1 2 3 2 2 1 1 2 1 2 2 2 3
+## Objective function:
+##     build      swap 
+## 0.6017778 0.6017778 
+## 
+## Available components:
+##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<pre class="r"><code>pamclust&lt;-project%&gt;%mutate(cluster=is.numeric(pam1$clustering))
+pamclust%&gt;%ggplot(aes(avg_hatecrimes_per_100k_fbi,share_non_white,color=cluster))+geom_point()+ggtitle(&quot;Clustering share_non_white vs. avg_hatecrimes_per_100k_fbi&quot;)</code></pre>
+<pre><code>## Warning: Removed 4 rows containing missing values (geom_point).</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" /> <em>From the PAM clustering done above there doesn’t seem to be any correlation between the two variables. There’s one outleir that is being disregared. However, even with the outlier removed there is not discernal=ble correlation between the two selected variables.</em></p>
+</div>

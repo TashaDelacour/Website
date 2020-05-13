@@ -1,0 +1,12 @@
+---
+title: "Hello, Python"
+author: "Frida Gomam"
+date: 2015-07-23T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+![](/post/2020-05-13-r-studio-python-blog-post_files/python joke.jpg)

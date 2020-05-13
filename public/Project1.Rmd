@@ -1,0 +1,116 @@
+---
+title: "Project1"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tasha Delacour td23448
+*I have chosen the datasets "hate_crimes" and "police_killings" due to believing there may be a possible correlatiom between the two. I have a sociology minor and I wokr with incarcerated youth (many of whom have been victims of police brutality). The datasets have 12 variables and 34 variables, respectively. However, I will mainly be focusing on these following variables: avg_hatecrimes_per_100k_fbi, age, gender, state, share_non_white, h_income, and college. I combined both datasets by their common variable "state". I expect that there will be correlations between amount of college completed and household income. I also expect there will also be a correlation between share_non_white and avg_hatecrimes_per_100k_fbi.*
+
+```{r}
+#Installed packages and viewed the datasets
+install.packages("fivethirtyeight")
+library(fivethirtyeight)
+data(package=.packages(all.available = TRUE))
+data(police_killings)
+data(hate_crimes)
+```
+
+
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("dplyr")
+library(dplyr)
+#renamed "state_abbrev" in hate_crimes dataset to "state" to match up to variable in police_killings
+hate_crimes<-hate_crimes%>%select(-state)
+hate_crimes<-hate_crimes%>%rename("state"="state_abbrev")
+merged.data2<-left_join(hate_crimes, police_killings, by="state")
+project<-merged.data2%>%group_by(state)
+project%>%pivot_longer(cols=c("cause","armed"), names_to="cause_of_death", values_to="values")
+project%>%pivot_wider(names_from="armed",values_from="cause")
+```
+*All joins were performed on the datasets to determine which was better. It was determined that a left_join was the best option as the max number of observations is increased to 471 and the variables have been combined to a make a total of 45 variables. No variables were dropped--I will manually drop them using dyplr functions. "state" was dropped from hate_crimes and "state_abbrev" was renamed to "state" in order to create a common ID for both datasets with the same formatted observation.*
+
+```{r}
+glimpse(project)
+project<-project%>%arrange(desc(age))
+project%>%filter(raceethnicity=="Black")
+project
+project<-project%>% mutate(non_white=share_black+share_hispanic)
+project<-project%>%select(-share_black, -share_hispanic)
+project<-project%>%rename("white"="share_white")
+project%>%summarise(mean(age))
+#removing columns that I found to be irrelavant to the comparisons I'm focusing on
+project<-project%>%select(-latitude, -longitude, -tract_ce, -state_fp, -county_fp, -geo_id, -county_id,
+                          -county_income, -county_bucket, -comp_income, -nat_bucket, -pov, -urate)
+project<-project%>%select(-namelsad, -gini_index)
+project<-project%>%select(-median_house_inc, -share_unemp_seas, -share_pop_metro,
+                          -share_pop_hs, -share_non_citizen, -share_white_poverty, -share_vote_trump)
+```
+
+```{r}
+IQR(project$age, na.rm = TRUE)
+mean(project$age, na.rm = TRUE)
+sd(project$age, na.rm = TRUE)
+n_distinct(project$age, na.rm = TRUE)
+quantile(project$age, na.rm = TRUE)
+#Installed Hmisc package to describe statistical variables of my combined datasets-->it wasn't letting me knit with this function below (error of multibyte string, element 1?). This bit of code below had all of my statistical analysis
+#install.packages("Hmisc")
+#library(Hmisc)
+#Hmisc::describe(project)
+```
+*Above is a table containing summary statistics on numeric variables as well as comparisons on gender and race/ethnicity. Value, proportion, and frequency is also calculated, showing that the majority of police killings happened in March and nearly all the victims were male (with an exception of 22 female victims). June had significantly fewer victims. The average age of victims is 37.7 years old, with the lowest and highest ages being 16 and 87, respectively. 236 of the victims were White, and 135 were Black--this did come as a surprise to me as typically White populations don't experience hate crimes at such high frequency (I therefore conclude that there may be other factors involved, such as religion).*
+```{r}
+#Comparing relationship between two variables using ggplot
+ggplot(data = project, aes(x = h_income, y = college, color = gender)) + 
+  geom_point(size = 4, alpha = .5) + ggtitle("College Education Received vs. Household Income")
+```
+*This graph depicts the relationship between household income and amount of college completed. A positive correlation can be seen between the two variables--the more college completed, the higher the household income (there are a few outliers). This graph also displays gender via color, and it can be seen that the majority of the dataset is composed of male victims. There a couple NA values, but they are marked with a separate color. The majority of the data is clustered towards the bottom left--from this it can be gleaned that while the victims of these hate crimes and/or police killings are from different states, they fit a similar demographic.*
+```{r}
+ggplot(data=project, aes(x = state, y = avg_hatecrimes_per_100k_fbi, fill=share_non_white))+
+  geom_bar(stat="summary")+ ggtitle("State Hate Crime Against Non-white Occurred vs. Average Hate Crimes")
+```
+*This graph demonstrates the relationship between the state were the killings occurred and the avg_hatecrimes_per_100k_fbi, and color codes by share_non_white. The grpah shows that DC actually has the highest average hatecrimes against non-white populations. DC also has a value of 0.6 in terms of share_non_white.The only part of the US that has no reported hate crimes is Hawaii. Most of the states fall in an average hate crime range of 2-5 (y-axis). States with low diversity (low share_non_white) tended to be located in the Mid-West.*
+```{r}
+#Retrieved packages from library to create correlation heatmap
+library(ggplot2)
+library(reshape2)
+cormap<-project[, c(2,4,6,20,21)]
+qplot(x=Var1, y=Var2, data=melt(cor(cormap)), fill=value, geom="tile")+ ggtitle("Correlation Heatmap")
+```
+*This correlation heatmap shows no correlation between any of the variables. This could be because there truly is no correlation, or a coding error.*
+
+```{r}
+#Performed PAM clustering on selected data variables
+library(cluster)
+clust_dat<-project%>%dplyr::select(age,avg_hatecrimes_per_100k_fbi,share_non_white)
+pam1<-clust_dat%>%pam(k=3)
+pam1
+pamclust<-project%>%mutate(cluster=is.numeric(pam1$clustering))
+pamclust%>%ggplot(aes(avg_hatecrimes_per_100k_fbi,share_non_white,color=cluster))+geom_point()+ggtitle("Clustering share_non_white vs. avg_hatecrimes_per_100k_fbi")
+```
+*From the PAM clustering done above there doesn't seem to be any correlation between the two variables. There's one outleir that is being disregared. However, even with the outlier removed there is not discernal=ble correlation between the two selected variables.*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
