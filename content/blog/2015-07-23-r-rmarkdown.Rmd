@@ -1,12 +1,13 @@
 ---
 title: "Hello, Python"
 author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+date: 2020-05-15T21:13:14-05:00
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["python"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 ![](/post/2020-05-13-r-studio-python-blog-post_files/python joke.jpg)
+Let's talk Leap Year--happens every four years! You can actually run code in python that will calculate what years Leap Year will happen. The original reason for adding an extra day to February every fourth year (at Julius Caesar's request) was to keep the calender in sync with the Earth's position relative to the sun. Unfortunately they calculated in too many leap years (Leap Day happens every four years unless it doesn't) and the calender fell out of sync by 10 days by 1577. Thankfully, the calender and the leap year system was improved!
